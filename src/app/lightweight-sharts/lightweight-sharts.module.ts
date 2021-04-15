@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { LightweightShartsComponent } from './lightweight-sharts.component';
 import { ResolverService } from './services/resolver.service';
 import { NavbarService } from './services/navbar.service';
+import { NavbarComponent } from './navbar/navbar.component';
 
 @NgModule({
-  declarations: [LightweightShartsComponent],
+  declarations: [LightweightShartsComponent, NavbarComponent],
   imports: [
     CommonModule
   ],

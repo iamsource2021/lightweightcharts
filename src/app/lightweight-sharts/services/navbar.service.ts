@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
-import { IntrumentModel} from './../models/index';
-import { of, Observable,from } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { IntrumentModel,Intrument} from './../models/index';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NavbarService {
 
-  constructor() { }
+  private dataSource = new BehaviorSubject<IntrumentModel>(new IntrumentModel);
 
-  public getParamsObserve(Intruments): Observable<IntrumentModel> {
-    return new Observable<IntrumentModel>(observer => observer.next(Intruments));
+  data:Observable<IntrumentModel> = this.dataSource.asObservable();
+
+  updatedDataSelection(data: IntrumentModel){
+    this.dataSource.next(data);
   }
-
-
 }

@@ -1,0 +1,57 @@
+<nav class="navbar navbar-light navbar-expand-md navigation-clean">
+  <div class="container">
+
+    <a class="navbar-brand">
+      {{symbol}}
+    </a>
+
+    <button data-toggle="collapse" data-target="#navcol-1" class="navbar-toggler">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+
+    <div class="collapse navbar-collapse" id="navcol-1">
+      <ul class="navbar-nav ml-auto">
+
+          <li class="nav-item">
+            <div class="navbar-brand" id="price">
+              {{price}}
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <button
+            class="btn btn-link border-pretty ml-3 btn-link-custom"
+            style="color:#ff4976;border: 1px solid #ff4976;font-weight: bolder;"
+            type="button"
+            (click)="Vender(symbol,0)">
+              Vender
+            </button>
+          </li>
+
+          <li class="nav-item">
+            <button
+            class="btn btn-link border-pretty ml-3 btn-link-custom"
+            style="color: #4bffb5;border: 1px solid #4bffb5;font-weight: bolder;"
+            type="button"
+            (click)="Comprar(symbol,0)">
+              Comprar
+            </button>
+          </li>
+
+          <li class="nav-item">
+            <button
+            class="btn btn-link border-pretty ml-3 btn-link-custom"
+            style="color: #ffd749;border: 1px solid #ffd749;font-weight: bolder;"
+            type="button"
+            (click)="Close(symbol,0)">
+              Close
+            </button>
+          </li>
+
+      </ul>
+    </div>
+
+  </div>
+</nav>

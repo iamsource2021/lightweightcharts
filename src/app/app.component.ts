@@ -17,7 +17,7 @@ export class AppComponent implements OnInit{
   }
 
   ngOnInit() {
-    this.getParams();
+    // this.getParams();
   }
   getParams(symbol='BTC/USD'){
     // let params = [
@@ -47,22 +47,21 @@ export class AppComponent implements OnInit{
     //   }
     // ];
 
-    this.paramsLightweightObservable = new Observable<any[]>((observer) => {
-      let params = [
-        {
-          event: {
-            querySelectorEvent:"body > app-root > lightweight-sharts"
-          },
-          eventname:'createChartEvent'
-        },
-        {
-          event: {
-            "symbol": symbol
-          },
-          eventname: 'mergeTickToBarEvent'
-        }
-      ];
-      observer.next(params);
-    });
+
+      // let params = [
+      //   // {
+      //   //   event: {
+      //   //     querySelectorEvent:"body > app-root > lightweight-sharts"
+      //   //   },
+      //   //   eventname:'createChartEvent'
+      //   // },
+      //   {
+      //     event: {
+      //       "symbol": symbol
+      //     },
+      //     eventname: 'mergeTickToBarEvent'
+      //   }
+      // ];
+
   }
 }

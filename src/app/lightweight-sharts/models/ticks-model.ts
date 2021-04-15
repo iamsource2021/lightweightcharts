@@ -1,4 +1,3 @@
-import { timestamp } from 'rxjs/operators';
 import { priceData } from './../data/priceData';
 import * as moment from 'moment';
 
@@ -27,6 +26,18 @@ export class TicksModel implements Ticks{
   }
 
   public noisedPrice=0;
+
+
+  public setCurrentBar(data){
+    //0-sell,1-buy, 4-high, 5-low
+    this.currentBar = {
+      time: data.Updated,
+      open: parseFloat(data.Rates[0]),
+      high: parseFloat(data.Rates[1]),
+      low: parseFloat(data.Rates[0]),
+      close: parseFloat(data.Rates[1])
+    }
+  }
 
   public reset(callback) {
     callback(priceData);

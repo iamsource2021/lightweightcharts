@@ -16,13 +16,11 @@ import {
   HistogramModel,
   TicksModel,
   PricelineModel,
-  ParamsOptions,
   IntrumentModel,
   TicksseriesModel
 } from './models/index';
 import { NavbarService } from './services/navbar.service';
 import { ResolverService } from  './services/resolver.service';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'lightweight-sharts',
@@ -37,7 +35,7 @@ import { Observable } from 'rxjs';
 })
 export class LightweightShartsComponent implements OnInit {
 
-  @Input() params:[ParamsOptions];
+  @Input() params:string;
 
   public elRef: ElementRef;
 
@@ -55,7 +53,11 @@ export class LightweightShartsComponent implements OnInit {
 
   public TicksseriesModel = new TicksseriesModel;
 
-  public IntrumentsObservable: Observable<IntrumentModel>;
+  public symbol: string;
+
+  public price:number;
+
+  public symbolObservable: Promise<string>;
 
   public candleSeries;
 
@@ -64,8 +66,7 @@ export class LightweightShartsComponent implements OnInit {
   constructor(
     private renderer: Renderer2,
     elRef: ElementRef,
-    private ResolverService:ResolverService,
-    private NavbarService:NavbarService
+    private ResolverService:ResolverService
   ) {
     this.elRef = elRef;
   }
@@ -81,14 +82,15 @@ export class LightweightShartsComponent implements OnInit {
   }
 
   triggerEvent(){
-    this.params.map(event =>{
-      switch(event.eventname){
-        case 'createChartEvent': this.createChartEvent(event); break;
-        case 'createPriceLine': this.createPriceLineEvent(event); break;
-        case 'mergeTickToBarEvent': this.mergeTickToBarEvent(event); break;
-        default: this.createChartEvent(event); break;
-      }
-    });
+    this.mergeTickToBarEvent();
+    // this.params.map(event =>{
+    //   switch(event.eventname){
+    //     case 'createChartEvent': this.createChartEvent(event); break;
+    //     case 'createPriceLine': this.createPriceLineEvent(event); break;
+    //     case 'mergeTickToBarEvent': this.mergeTickToBarEvent(event); break;
+    //     default: this.createChartEvent(event); break;
+    //   }
+    // });
   }
 
   createPriceLineEvent(params){
@@ -130,66 +132,54 @@ export class LightweightShartsComponent implements OnInit {
     this.TicksModel.init();
   }
 
-   mergeTickToBarEvent(event){
-    let symbol = [event.event.symbol];
-    // this.IntrumentsObservable = new Observable<IntrumentModel>((observer) => {
-    //   observer.next(this.IntrumentModel);
-    // });
-    this.ResolverService.RatesSuscription(symbol, (data) => {
-      // this.TicksModel.stockTickToBar(data,(currentBar)=>{
-        //0-sell,1-buy, 4-high, 5-low
-        this.TicksModel.currentBar = {
-          time: data.Updated,
-          open: parseFloat(data.Rates[0]),
-          high: parseFloat(data.Rates[1]),
-          low: parseFloat(data.Rates[0]),
-          close: parseFloat(data.Rates[1])
-        }
-
-        this.TicksModel.currentBar = this.TicksseriesModel
-        .getInterval('1MIN',this.TicksModel.currentBar);
-        this.candleSeries.update(this.TicksModel.currentBar);
-        this.IntrumentModel.setParams(
-          Object.assign(this.TicksModel.currentBar, {symbol:data.Symbol}));
-        // console.log(this.IntrumentModel);
-        // this.emiterIntrument(this.IntrumentModel);
-        // this.IntrumentsObservable.subscribe();
-        // this.IntrumentsObservable = new Observable<IntrumentModel>(observer => {
-        //     observer.next(this.IntrumentModel);
-        // });
-        this.IntrumentsObservable = this.NavbarService.getParamsObserve(this.IntrumentModel);
-        this.IntrumentsObservable.subscribe(v=>{
-
-          // this.IntrumentModel = v;
-          this.IntrumentModel.setParams(v);
-          // console.log(this.IntrumentModel);
-        })
-        // this.IntrumentsObservable.subscribe({
-        //   next(data) {
-        //     // console.log(data);
-        //     return data
-        //   },
-        //   error(error) {
-        //     console.log(error);
-        //   }
-        // });
-        // this.IntrumentsObservable.subscribe({
-        //   next: x =>{
-        //     console.log(x);
-        //     x = this.IntrumentModel;
-        //   }
-        // });
-
-      // });
-    });
-
+ async setUpdatescandles(data){
+    this.TicksModel.setCurrentBar(data);
+    this.TicksModel.currentBar = await this.TicksseriesModel
+    .getInterval('1MIN',this.TicksModel.currentBar);
+    await this.candleSeries.update(this.TicksModel.currentBar);
   }
 
-  public emiterIntrument(Intruments){
-    this.IntrumentsObservable  = new Observable<IntrumentModel>((observer) => {
-        console.log(Intruments);
-        observer.next(Intruments);
+  async mergeTickToBarEvent(){
+    this.forceUpdate(0);
+    this.ChartModel.setParams({querySelectorEvent:"body > app-root > lightweight-sharts"});
+    let chartContainer = document.querySelector(this.ChartModel.querySelectorEvent)
+    .shadowRoot.querySelector("div.chart-container");
+    let container = this.renderer.createElement('div');
+    this.renderer.appendChild(chartContainer, container);
+    this.chart = createChart(container,this.ChartModel.getParams());
+
+    //add Series
+    this.candleSeries = this.chart.addCandlestickSeries(this.CandleModel.getParams());
+    this.chart.applyOptions(
+      {
+        timeScale:
+        {
+          rightOffset:12,
+          timeVisible: true,
+          barSpacing:10,
+          secondsVisible: true,
+        },
+        priceScale:
+        {
+          autoScale:true
+        },
+      });
+    let symbol = [this.params];
+    this.symbol = this.params;
+
+    await this.ResolverService.RatesSuscription(symbol,async data=>{
+      await this.setUpdatescandles(data);
+      this.IntrumentModel.setParams(
+      Object.assign(this.TicksModel.currentBar, {symbol:data.Symbol}));
+      let pricel = parseFloat(this.TicksModel.currentBar.close);
+      this.forceUpdate(pricel);
     });
+  }
+
+  public forceUpdate(price){
+    this.price = price;
+    let pricel = document.querySelector(this.ChartModel.querySelectorEvent)
+    .shadowRoot.querySelector("#price").innerHTML = price.toFixed(2);
   }
 
   public loadScript(url: string) {
@@ -200,17 +190,5 @@ export class LightweightShartsComponent implements OnInit {
     script.async = false;
     script.defer = true;
     body.appendChild(script);
-  }
-
-  Comprar(symbol,open){
-    console.log(symbol,open);
-  }
-
-  Vender(symbol,open){
-    console.log(symbol,open);
-  }
-
-  Close(symbol,open){
-    console.log(symbol,open);
   }
 }
