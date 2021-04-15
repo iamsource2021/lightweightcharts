@@ -162,7 +162,7 @@ export class LightweightShartsComponent implements OnInit {
 
           // this.IntrumentModel = v;
           this.IntrumentModel.setParams(v);
-          console.log(this.IntrumentModel);
+          // console.log(this.IntrumentModel);
         })
         // this.IntrumentsObservable.subscribe({
         //   next(data) {

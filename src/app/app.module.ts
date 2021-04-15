@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { LightweightShartsModule } from './lightweight-sharts/lightweight-sharts.module';
+import { GraphQLModule } from './graphql.module';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -10,7 +12,9 @@ import { LightweightShartsModule } from './lightweight-sharts/lightweight-sharts
   ],
   imports: [
     BrowserModule,
-    LightweightShartsModule
+    LightweightShartsModule,
+    GraphQLModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
